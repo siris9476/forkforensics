@@ -1,0 +1,7 @@
+# Core library dependencies (forkforensics/). Upper bounds are deliberate:
+# APScheduler 4.x removes the 3.x BackgroundScheduler API the desktop app
+# relies on, so an unbounded pin would break a fresh clone with no code
+# change here.
+requests>=2.32,<3
+aiohttp>=3.10,<4
+apscheduler>=3.10,<4

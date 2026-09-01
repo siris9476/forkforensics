@@ -1,0 +1,164 @@
+/* Same visual identity as the web redesign (app/static/style.css):
+   charcoal brown + desaturated amber accent, not the generic blue-black
+   dashboard look. Qt Style Sheets (QSS) are a subset of CSS2.1 - same
+   logic, slightly different syntax (selectors by Python class, not
+   HTML element). */
+
+QMainWindow, QWidget {
+    background-color: #16130f;
+    color: #ede7dc;
+    font-family: "Segoe UI", "Space Grotesk", sans-serif;
+    font-size: 13px;
+}
+
+/* --------------------------------------------------------------- nav */
+QListWidget#sidebar {
+    background-color: #1e1a14;
+    border: none;
+    border-right: 1px solid #332c22;
+    padding: 8px;
+    outline: none;
+}
+QListWidget#sidebar::item {
+    padding: 10px 14px;
+    border-radius: 6px;
+    margin-bottom: 2px;
+    color: #b3a996;
+}
+QListWidget#sidebar::item:selected {
+    background-color: #d99a4e;
+    color: #1a1310;
+    font-weight: 600;
+}
+QListWidget#sidebar::item:hover:!selected {
+    background-color: #241f18;
+    color: #ede7dc;
+}
+
+/* -------------------------------------------------------------- cards
+   Note: "Card" is a real QFrame subclass (desktop/widgets/
+   disappearance_card.py) - in QSS a selector WITHOUT a dot (Card, not
+   .Card) selects by real Qt class name and includes subclasses; it's the
+   idiomatic way to do style "classes" in Qt, unlike HTML's arbitrary
+   CSS classes. */
+Card {
+    background-color: #1e1a14;
+    border: 1px solid #292319;
+    border-radius: 10px;
+}
+Card:hover {
+    background-color: #241f18;
+    border: 1px solid #332c22;
+}
+
+/* ------------------------------------------------------------- badge
+   Note: QSS doesn't support multi-value CSS classes like HTML - matching
+   on a dynamic property is by EXACT match, not "contains one of these
+   words". Every Badge has objectName="badge" (shared across instances,
+   for the base style) + a dynamic badgeVariant property
+   (ambiguous|recovered|lost) selected via attribute, instead of fake
+   space-separated "classes". */
+QLabel#badge {
+    border-radius: 4px;
+    padding: 3px 9px;
+    font-size: 11px;
+    font-weight: 600;
+}
+QLabel#badge[badgeVariant="ambiguous"] { background-color: #3a3018; color: #d9b34e; }
+QLabel#badge[badgeVariant="recovered"] { background-color: #2a3320; color: #8fae6f; }
+QLabel#badge[badgeVariant="lost"]       { background-color: #3a2119; color: #cf6a52; }
+
+/* ------------------------------------------------------------ inputs */
+QLineEdit, QComboBox, QDateEdit {
+    background-color: #100d09;
+    color: #ede7dc;
+    border: 1px solid #332c22;
+    border-radius: 4px;
+    padding: 7px 9px;
+}
+QLineEdit:focus, QComboBox:focus, QDateEdit:focus {
+    border: 1px solid #d99a4e;
+}
+
+QPushButton {
+    background-color: #d99a4e;
+    color: #1a1310;
+    border: none;
+    border-radius: 4px;
+    padding: 9px 18px;
+    font-weight: 600;
+}
+QPushButton:hover { background-color: #e0a75e; }
+QPushButton:pressed { background-color: #c78d44; }
+QPushButton:disabled { background-color: #6b5030; color: #8a8070; }
+QPushButton#secondary {
+    background-color: #241f18;
+    color: #ede7dc;
+    border: 1px solid #332c22;
+}
+QPushButton#secondary:hover { background-color: #2c2620; }
+
+/* ------------------------------------------------------------- table */
+QTableWidget {
+    background-color: #16130f;
+    gridline-color: #292319;
+    border: 1px solid #292319;
+    border-radius: 8px;
+}
+QHeaderView::section {
+    background-color: #1e1a14;
+    color: #8a8070;
+    padding: 8px;
+    border: none;
+    border-bottom: 1px solid #332c22;
+    font-size: 11px;
+    text-transform: uppercase;
+}
+QTableWidget::item { padding: 6px; }
+QTableWidget::item:selected { background-color: #3a3018; color: #ede7dc; }
+
+/* --------------------------------------------------------- progress */
+/* Thin, textless bar by default. The clone dialog opts into a taller bar
+   with a readable label via objectName="withText" - previously it called
+   setTextVisible(True) but this global rule painted the text transparent
+   in a bar too short to hold it, so the percentage was never visible. */
+QProgressBar {
+    background-color: #292319;
+    border: none;
+    border-radius: 4px;
+    height: 8px;
+    text-align: center;
+    color: transparent;
+}
+QProgressBar::chunk {
+    background-color: #d99a4e;
+    border-radius: 4px;
+}
+QProgressBar#withText {
+    height: 18px;
+    color: #ede7dc;
+    font-size: 11px;
+}
+
+/* --------------------------------------------------------- checkbox
+   Without this rule the indicator uses Windows' native rendering, nearly
+   invisible on the dark background - the same "dark field + amber outline
+   on focus/check" treatment already used for the other inputs. */
+QCheckBox::indicator {
+    width: 15px;
+    height: 15px;
+    border: 1px solid #332c22;
+    border-radius: 3px;
+    background-color: #100d09;
+}
+QCheckBox::indicator:hover { border: 1px solid #d99a4e; }
+QCheckBox::indicator:checked { background-color: #d99a4e; border: 1px solid #d99a4e; }
+
+QScrollArea { border: none; background: transparent; }
+/* Attribute selectors, not the HTML-style "QLabel.muted": QSS has no
+   class-dot syntax, so these three rules never matched anything and every
+   label ended up carrying a duplicated inline setStyleSheet instead. The
+   code sets them via setProperty("class", ...). */
+QLabel[class="muted"] { color: #8a8070; font-size: 12px; }
+QLabel[class="heading"] { font-size: 18px; font-weight: 600; color: #ede7dc; }
+QLabel[class="subheading"] { font-size: 13px; font-weight: 500; color: #b3a996; }

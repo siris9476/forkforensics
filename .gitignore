@@ -1,0 +1,31 @@
+# virtualenvs
+.venv/
+.venv_*/
+
+# python
+__pycache__/
+*.pyc
+*.egg-info/
+.pytest_cache/
+.ruff_cache/
+
+# app data: database, logs, downloaded archives, local rescues.
+# NOTE: the SQLite database holds the GitHub token in plaintext - it must
+# never be committed.
+data/
+*.db
+*.db-journal
+*.log
+.env
+
+# build artifacts
+build/
+dist/
+*.spec
+
+# editors / OS
+.idea/
+.vscode/
+.DS_Store
+.coverage
+htmlcov/

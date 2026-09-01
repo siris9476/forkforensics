@@ -1,0 +1,6 @@
+# Test toolchain. Kept out of requirements.txt so end users don't install
+# it. Running the suite also needs requirements-desktop.txt: some tests
+# import PySide6.
+-r requirements.txt
+-r requirements-desktop.txt
+pytest>=8.0,<10

@@ -1,0 +1,18 @@
+# Not a packaging manifest (the app is run from a clone, not pip-installed)
+# — this exists to declare the Python floor and to give pytest a real
+# config, replacing the sys.path.insert hack that used to live in
+# tests/conftest.py. desktop/main.py keeps its own: pythonpath here only
+# affects test collection, not the app's own `python -m desktop.main`
+# runtime import resolution, which is a separate concern.
+
+[project]
+name = "forkforensics"
+version = "0.1.0"
+description = "Detects vanished GitHub repositories and recovers their history from forks and orphan commits"
+requires-python = ">=3.11"
+license = { file = "LICENSE" }
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"

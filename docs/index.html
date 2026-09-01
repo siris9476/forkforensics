@@ -1,0 +1,252 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>ForkForensics — vanished GitHub repositories, recovered</title>
+<meta name="description" content="A local tool that monitors every day which GitHub repositories have vanished and tries to recover their history from forks and orphan commits. Runs on your computer, with your token.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%2316130f'/%3E%3Crect x='6.8' y='6.5' width='2.9' height='19' rx='0.55' fill='%23d99a4e'/%3E%3Crect x='6.8' y='6.5' width='8' height='3.4' rx='0.55' fill='%23d99a4e'/%3E%3Crect x='6.8' y='14.48' width='6.1' height='2.8' rx='0.55' fill='%23d99a4e'/%3E%3Crect x='17.2' y='6.5' width='2.9' height='19' rx='0.55' fill='%23d99a4e'/%3E%3Crect x='17.2' y='6.5' width='8' height='3.4' rx='0.55' fill='%23d99a4e'/%3E%3Crect x='17.2' y='14.48' width='6.1' height='2.8' rx='0.55' fill='%23d99a4e'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="shell">
+
+    <header class="site-header">
+        <a class="brand" href="#top">
+            <span class="brand-mark">
+                <svg viewBox="0 0 32 32" fill="#1a1310">
+                    <rect x="6.8" y="6.5" width="2.9" height="19" rx="0.55"/>
+                    <rect x="6.8" y="6.5" width="8" height="3.4" rx="0.55"/>
+                    <rect x="6.8" y="14.48" width="6.1" height="2.8" rx="0.55"/>
+                    <rect x="17.2" y="6.5" width="2.9" height="19" rx="0.55"/>
+                    <rect x="17.2" y="6.5" width="8" height="3.4" rx="0.55"/>
+                    <rect x="17.2" y="14.48" width="6.1" height="2.8" rx="0.55"/>
+                </svg>
+            </span>
+            ForkForensics
+        </a>
+        <nav>
+            <a href="#how-it-works">How it works</a>
+            <a href="#real-case">Real case</a>
+            <a href="#local">100% local</a>
+            <a href="#limits">Known limits</a>
+            <a href="#download">Download</a>
+        </nav>
+    </header>
+
+    <div id="top"></div>
+    <section class="hero no-border">
+        <div class="hero-text">
+            <span class="eyebrow">desktop tool · local · open</span>
+            <h1>GitHub never tells you when a repository vanishes.</h1>
+            <p class="lede">
+                A deleted repo and one made private return exactly the same
+                404. <strong>ForkForensics</strong> watches active ones every
+                day, notices when one stops responding, and immediately
+                tries to recover its history from forks still alive and
+                orphan commits.
+            </p>
+            <div class="cta-row">
+                <a class="btn" href="#download">Download and run</a>
+                <a class="btn btn-ghost" href="#how-it-works">How it works →</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="no-border" id="why">
+        <div class="split reverse">
+            <div class="split-text">
+                <span class="eyebrow">the problem</span>
+                <h2>Vanished or made private? From the outside it's indistinguishable.</h2>
+                <p class="lede-block">
+                    To notice that a public repository has vanished, you have
+                    to have seen it alive and rechecked it later — there's no
+                    "repository deleted" event in GitHub's API. This tool
+                    automates exactly that check, at scale: every night it
+                    downloads the previous day's public events from GH
+                    Archive, extracts every repository seen in any event, and
+                    bulk-rechecks (GraphQL, 100 at a time) the ones due for
+                    verification.
+                </p>
+            </div>
+            <div class="split-media">
+                <img src="screenshots/feed.png" alt="Feed of detected disappearances, with the Refresh now button">
+            </div>
+        </div>
+    </section>
+
+    <section id="how-it-works">
+        <div class="section-head">
+            <span class="eyebrow">the mechanism</span>
+            <h2>Two independent signals, not just one</h2>
+            <p class="lede-block">
+                When a repository stops responding, ForkForensics doesn't stop
+                there: it tries to reconstruct what's still reachable, on the
+                same infrastructure GitHub uses for forks.
+            </p>
+        </div>
+        <div class="steps">
+            <div class="step">
+                <div class="step-num">01</div>
+                <div>
+                    <h3>Fork ranking by historical depth</h3>
+                    <p>
+                        The fork network preserves a frozen history even
+                        after the original vanishes. Every known fork is
+                        recursively rechecked (fork-of-forks included) and
+                        ranked by how far back in time its oldest commit
+                        reaches.
+                    </p>
+                </div>
+            </div>
+            <div class="step">
+                <div class="step-num">02</div>
+                <div>
+                    <h3>Orphan commits still alive</h3>
+                    <p>
+                        GitHub keeps serving, for an undocumented period,
+                        commits no longer reachable from any branch, if you
+                        know their exact SHA. They're verified with three
+                        independent signals — REST metadata, a raw file
+                        fetch, and a real <code>git fetch</code> — before
+                        being called recoverable.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section id="real-case">
+        <div class="section-head">
+            <span class="eyebrow">verified live, not just in theory</span>
+            <h2>The case that gave birth to this tool</h2>
+            <p class="lede-block">
+                A public repository this project depended on was
+                re-initialized, apparently losing years of history.
+                Recovering it by hand took hours of manual work — hence the
+                idea of automating the entire process.
+            </p>
+        </div>
+        <div class="case-card">
+            <h3>Fork ranking reproduced exactly by the tool</h3>
+            <p style="color: var(--fg-dim); font-size: 0.92rem;">
+                The same ranking found by hand months earlier, reproduced
+                automatically by the verification cycle, deepest fork first:
+            </p>
+            <div class="fork-chain">
+                <span class="node best">Fork A</span>
+                <span class="arrow">→</span>
+                <span class="node">Fork B</span>
+                <span class="arrow">→</span>
+                <span class="node">Fork C</span>
+                <span class="arrow">→</span>
+                <span class="node">Fork D</span>
+                <span class="arrow">→</span>
+                <span class="node gone">Fork E (since gone too)</span>
+            </div>
+            <p class="pull-quote">
+                In the process, a real bug surfaced in the fork-of-fork
+                recursion: the initial heuristic (<code>pushed_at &gt;
+                created_at</code>) turned out to be wrong — a fork's
+                <code>pushed_at</code> inherits the timestamp of the
+                source's last commit, and can precede <code>created_at</code>
+                for a fork never touched again. Fixed using
+                <code>forks_count</code>, the right signal already present in
+                the API response. Thanks to the fix, even the rescue fork
+                used for the original manual recovery reappeared in the
+                ranking, along with two other previously invisible
+                fork-of-forks.
+            </p>
+        </div>
+    </section>
+
+    <section id="local">
+        <div class="section-head">
+            <span class="eyebrow">architecture</span>
+            <h2>100% local. Your token stays yours.</h2>
+            <p class="lede-block">
+                There's no public instance investigating repositories on
+                behalf of strangers with a shared token — that would be a
+                security risk and a quick way to exhaust API rate limits.
+                This page is just a showcase: the real tool runs on your
+                computer.
+            </p>
+        </div>
+        <div class="trust-grid">
+            <div class="trust-item">
+                <div class="glyph">native app</div>
+                <p>A real desktop window (PySide6/Qt) — no browser, no web server involved.</p>
+            </div>
+            <div class="trust-item">
+                <div class="glyph">your token</div>
+                <p>The GitHub token you configure stays in a local file on your computer, sent only to GitHub itself (api.github.com and raw.githubusercontent.com). Stored unencrypted — see SECURITY.md.</p>
+            </div>
+            <div class="trust-item">
+                <div class="glyph">your data</div>
+                <p>The database of monitored repositories and recovery outcomes is a local SQLite file, yours.</p>
+            </div>
+        </div>
+    </section>
+
+    <section id="download">
+        <div class="section-head">
+            <span class="eyebrow">getting started</span>
+            <h2>Download and run</h2>
+        </div>
+        <div class="download-panel">
+            <div>
+                <h3>Only Python is needed</h3>
+                <p style="color: var(--fg-dim); font-size: 0.92rem; margin-bottom: 0;">
+                    Clone this repository, then install the dependencies and
+                    run the desktop app. On first launch, paste a GitHub
+                    token into the Settings page — needed for the daily
+                    cycle and for higher rate limits.
+                </p>
+                <ul class="req-list">
+                    <li>Python 3.11 or later, and Git</li>
+                    <li>Windows (tested) — macOS and Linux untested</li>
+                    <li>A GitHub token: a classic one needs no scopes at all</li>
+                </ul>
+            </div>
+            <pre><code>git clone https://github.com/siris9476/forkforensics.git
+cd forkforensics
+python -m venv .venv
+
+# Windows
+.venv\Scripts\pip install -r requirements.txt -r requirements-desktop.txt
+.venv\Scripts\pythonw -m desktop.main
+
+# macOS / Linux
+.venv/bin/pip install -r requirements.txt -r requirements-desktop.txt
+.venv/bin/python -m desktop.main</code></pre>
+        </div>
+    </section>
+
+    <section id="limits">
+        <div class="section-head">
+            <span class="eyebrow">declared, not hidden</span>
+            <h2>Known limits</h2>
+        </div>
+        <ul class="limits">
+            <li>
+                <strong>Scale</strong>
+                <span>Empirically verified: ~27,000 unique repositories seen in a SINGLE hour of GH Archive. The daily re-verification queue can exceed what a single GitHub token can process.</span>
+            </li>
+            <li>
+                <strong>Private vs deleted</strong>
+                <span>Indistinguishable from the outside by definition — both shown as ambiguous, never passed off as a certainty that doesn't exist.</span>
+            </li>
+            <li>
+                <strong>Orphan commit survival</strong>
+                <span>Neither documented nor guaranteed by GitHub in duration: the tool photographs the state "now", it doesn't promise it will still hold true tomorrow.</span>
+            </li>
+        </ul>
+    </section>
+
+    <footer>
+        <span>ForkForensics — GitHub repository recovery via forks and orphan SHAs</span>
+        <span class="mono">static page, no live data</span>
+    </footer>
+</div>
+</body>
+</html>
